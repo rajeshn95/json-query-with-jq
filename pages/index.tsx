@@ -16,7 +16,7 @@ export default function Home() {
   const [jqQuery, setJqQuery] = useState(""); // State for jq query
   const [outputData, setOutputData] = useState(""); // State for output data
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const response = await fetch("/api/jq-query", {
       method: "POST",
@@ -43,7 +43,7 @@ export default function Home() {
         <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2">Enter your JSON data in the input field.</li>
           <li>Write your jq query in the provided query box.</li>
-          <li>Click "Run Query" to see the results.</li>
+          <li>Click &quot;Run Query&quot; to see the results.</li>
         </ol>
         <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
           <div className="w-full flex flex-row gap-4">
