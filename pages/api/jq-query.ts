@@ -16,6 +16,12 @@ export default async function handler(
   //   const rawResult = await jq.raw(req.body.data, ".foo", ["-c"]);
   //   console.log(rawResult); // Output: "1\n2\n3"
 
+  if (!jq) {
+    console.error("jq is not initialized");
+    res.status(500).json({ error: "jq is not initialized" });
+    return;
+  }
+
   // Using jq.json for parsed JSON output
   const result: JqResult = await jq.json(
     JSON.parse(req.body.data),
