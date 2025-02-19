@@ -15,16 +15,20 @@ export default function Home() {
   const [jsonData, setJsonData] = useState(""); // Add state for JSON data
   const [jqQuery, setJqQuery] = useState(""); // State for jq query
   const [outputData, setOutputData] = useState(""); // State for output data
+  const [useEdgeRuntime, setUseEdgeRuntime] = useState(false); // NEW: State for the checkbox
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const response = await fetch("/api/jq-query", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ query: jqQuery, data: jsonData }), // Send JSON data as payload
-    });
+    const response = await fetch(
+      useEdgeRuntime ? "/api/jq-query-edge" : "/api/jq-query",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: jqQuery, data: jsonData }), // Send JSON data as payload
+      }
+    );
     const result = await response.json();
     console.log(result); // Handle the response as needed
     setOutputData(JSON.stringify(result, null, 2));
@@ -158,6 +162,20 @@ export default function Home() {
               value={jqQuery}
               onChange={(e) => setJqQuery(e.target.value)}
             />
+          </div>
+
+          {/* Checkbox for Edge runtime */}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="edgeRuntime"
+              className="w-4 h-4"
+              checked={useEdgeRuntime}
+              onChange={(e) => setUseEdgeRuntime(e.target.checked)}
+            />
+            <label htmlFor="edgeRuntime" className="text-gray-800">
+              Run with Edge runtime
+            </label>
           </div>
 
           {/* Run Query Button */}
