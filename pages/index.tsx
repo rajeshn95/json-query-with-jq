@@ -15,7 +15,8 @@ export default function Home() {
   const [jsonData, setJsonData] = useState(""); // Add state for JSON data
   const [jqQuery, setJqQuery] = useState(""); // State for jq query
   const [outputData, setOutputData] = useState(""); // State for output data
-  const [useEdgeRuntime, setUseEdgeRuntime] = useState(false); // NEW: State for the checkbox
+  // const [useEdgeRuntime, setUseEdgeRuntime] = useState(false); // NEW: State for the checkbox
+  const [useEdgeRuntime] = useState(false); // NEW: State for the checkbox
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -165,7 +166,7 @@ export default function Home() {
           </div>
 
           {/* Checkbox for Edge runtime */}
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <input
               type="checkbox"
               id="edgeRuntime"
@@ -176,7 +177,7 @@ export default function Home() {
             <label htmlFor="edgeRuntime" className="text-gray-800">
               Run with Edge runtime
             </label>
-          </div>
+          </div> */}
 
           {/* Run Query Button */}
           <div className="flex justify-center">
