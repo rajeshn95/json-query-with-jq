@@ -41,7 +41,16 @@ export default async function handler(req: Request) {
   const wasmBuffer = await wasmResponse.arrayBuffer();
   console.log("wasmBuffer::>", wasmBuffer);
   const wasmModule = await WebAssembly.instantiate(wasmBuffer);
-
+  const { instance } = await WebAssembly.instantiateStreaming(wasmResponse, {
+    wasi_snapshot_preview1: {
+      // Implement the required functions here
+      // For example, if the module requires a `fd_write` function:
+      fd_write: (fd, iovs, iovs_len, result) => {
+        // Implement your logic here
+      },
+      // Add other required functions as needed
+    },
+  });
   // Get jq exports
   const { exports } = wasmModule.instance;
 
