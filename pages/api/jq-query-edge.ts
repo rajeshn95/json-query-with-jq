@@ -1,6 +1,16 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 // const jq = require("jq-wasm");
-import * as jq from "jq-wasm";
+// declare module "*.wasm" {
+//   const src: string;
+//   export default src;
+// }
+
+// import * as jq from "jq-wasm";
+// import wasmModule from "../../jq.wasm?module"; // jq.wasm
+declare module "../../jq.wasm" {
+  const src: string;
+  export default src;
+}
 
 type JqResult = object | object[] | null;
 
@@ -9,24 +19,37 @@ export const config = {
 };
 
 export default async function handler(req: Request) {
+  // console.log("wasmModule:::>", wasmModule);
+  // const { exports } = (await WebAssembly.instantiate(wasmModule)) as any;
+
+  // const wasmResponse = await fetch("/wasm/jq.wasm");
+  // const wasmResponse = await fetch(
+  //   new URL("http://localhost:3000/wasm/jq.wasm", import.meta.url)
+  // );
+  const wasmResponse = await fetch(`http://localhost:3000/wasm/jq.wasm`);
+  console.log("Fetched wasm response:", wasmResponse);
+  if (!wasmResponse.ok) {
+    return new Response("Failed to fetch jq.wasm", { status: 500 });
+  }
+  console.log("Content-Type:", wasmResponse.headers.get("content-type"));
+
+  // const wasmModule = await WebAssembly.instantiateStreaming(
+  //   // await fetch("http://localhost:3000/wasm/jq.wasm")
+  //   wasmResponse
+  // );
+
+  const wasmBuffer = await wasmResponse.arrayBuffer();
+  console.log("wasmBuffer::>", wasmBuffer);
+  const wasmModule = await WebAssembly.instantiate(wasmBuffer);
+
+  // Get jq exports
+  const { exports } = wasmModule.instance;
+
   const body = await req.json();
   console.log("EDGE-RUNTIME Request--->", body, body.data);
   console.log("EDGE-RUNTIME Data--->", typeof body.data, body.data);
 
-  // Using jq.raw for raw text output
-  //   const rawResult = await jq.raw(req.body.data, ".foo", ["-c"]);
-  //   console.log(rawResult); // Output: "1\n2\n3"
-
-  if (!jq) {
-    console.error("EDGE-RUNTIME jq is not initialized");
-    return new Response(JSON.stringify({ error: "jq is not initialized" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  // Using jq.json for parsed JSON output
-  const result: JqResult = await jq.json(JSON.parse(body.data), body.query);
+  const result: JqResult = await exports.run(JSON.parse(body.data), body.query);
   console.log("EDGE-RUNTIME Result--->", result); // Output: ["bar"]
 
   return new Response(JSON.stringify(result), {

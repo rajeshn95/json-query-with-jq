@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 // const jq = require("jq-wasm");
 import * as jq from "jq-wasm";
+import wasmModule from "./jq.wasm?module";
 
 type JqResult = object | object[] | null;
 
@@ -9,6 +10,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const { exports } = (await WebAssembly.instantiate(wasmModule)) as any;
+  console.log("instance::::>", exports);
   console.log("Request--->", req.body, req.body.data);
   console.log("Data--->", typeof req.body.data, req.body.data);
 
